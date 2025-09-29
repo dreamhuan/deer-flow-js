@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
-import { z } from 'zod/v4';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
-import { tool } from '@langchain/core/tools';
+import { tools } from './tools.js';
 
 dotenv.config();
 
@@ -13,48 +12,21 @@ export const embeddings = new OpenAIEmbeddings({
   },
 });
 
-// 开发测试使用免费模型
+// export const llm = new ChatOpenAI({
+//   // model: 'deepseek-ai/DeepSeek-V3.1',
+//   model: 'Qwen/Qwen3-8B', // 开发测试使用免费模型
+//   configuration: {
+//     baseURL: 'https://api.siliconflow.cn/v1/',
+//   },
+// });
+
+// 记得开启免费“额度用完即停”功能
 export const llm = new ChatOpenAI({
-  model: 'Qwen/Qwen3-8B',
-  // model: 'deepseek-ai/DeepSeek-V3.1',
+  model: 'qwen3-max-2025-09-23',
   configuration: {
-    baseURL: 'https://api.siliconflow.cn/v1/',
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    apiKey: process.env.DASHSCOPE_API_KEY!,
   },
 });
 
-// Define tools
-const add = tool(({ a, b }) => a + b, {
-  name: 'add',
-  description: 'Add two numbers',
-  schema: z.object({
-    a: z.number().describe('First number'),
-    b: z.number().describe('Second number'),
-  }),
-});
-
-const multiply = tool(({ a, b }) => a * b, {
-  name: 'multiply',
-  description: 'Multiply two numbers',
-  schema: z.object({
-    a: z.number().describe('First number'),
-    b: z.number().describe('Second number'),
-  }),
-});
-
-const divide = tool(({ a, b }) => a / b, {
-  name: 'divide',
-  description: 'Divide two numbers',
-  schema: z.object({
-    a: z.number().describe('First number'),
-    b: z.number().describe('Second number'),
-  }),
-});
-
-// Augment the LLM with tools
-export const toolsByName = {
-  [add.name]: add,
-  [multiply.name]: multiply,
-  [divide.name]: divide,
-};
-export const tools = Object.values(toolsByName);
 export const llmWithTools = llm.bindTools(tools);
