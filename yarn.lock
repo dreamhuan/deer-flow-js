@@ -329,6 +329,13 @@
     openai "5.12.2"
     zod "^3.25.32"
 
+"@langchain/tavily@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@langchain/tavily/-/tavily-0.1.5.tgz#b8c86cdd1f4af1c9397a1899b840527a38646b2b"
+  integrity sha512-6C8hb3d6YjlGJPdPFfaNlrUS0h6blQx4cRzCKeDdCvixcghzV8llAmuzvJSmAyALprFfvKtj+1NJb4ttj1iZ/A==
+  dependencies:
+    zod "^3.25.32"
+
 "@langchain/textsplitters@1.0.0-alpha.1":
   version "1.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/@langchain/textsplitters/-/textsplitters-1.0.0-alpha.1.tgz#4aa4e0d1cfa767b123de7c2685eb2d7c9d589873"
