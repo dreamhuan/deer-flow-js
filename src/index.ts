@@ -1,9 +1,9 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { agent } from './graph/graph.js';
+import { graph } from './graph/graph.js';
 import { printMsg } from './utils/utils.js';
 
 async function main() {
-  const result = await agent.invoke({
+  const result = await graph.invoke({
     messages: [new HumanMessage('计算12*(9+5/7)-2*6=?')],
   });
 

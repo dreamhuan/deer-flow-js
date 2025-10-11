@@ -1,5 +1,5 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { agent } from './graph/graph.js';
+import { graph } from './graph/graph.js';
 import { printMsg } from './utils/utils.js';
 import prompts from 'prompts';
 import ora from 'ora';
@@ -33,7 +33,7 @@ async function cli() {
 
     try {
       const question = userInput.message;
-      const result = await agent.invoke({
+      const result = await graph.invoke({
         messages: [new HumanMessage(question)],
       });
 

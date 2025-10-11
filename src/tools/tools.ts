@@ -1,4 +1,4 @@
-import { z } from 'zod/v3';
+import { z } from 'zod/v4';
 import { StructuredTool, tool } from '@langchain/core/tools';
 import { TavilyCrawl, TavilySearch } from '@langchain/tavily';
 import dotenv from 'dotenv';
