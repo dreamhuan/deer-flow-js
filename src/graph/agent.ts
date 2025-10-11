@@ -7,8 +7,11 @@ import {
   ToolMessage,
   type BaseMessage,
 } from '@langchain/core/messages';
-import { llmWithTools } from '../llms/llm.js';
-import { toolsByName } from '../tools/tools.js';
+import { llm, llmWithTools } from '../llms/llm.js';
+import { tools, toolsByName } from '../tools/tools.js';
+import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import type { StructuredTool } from 'langchain/tools';
+import { applyPromptTemplate } from '../prompts/index.js';
 
 const MessagesState = z.object({
   messages: z
@@ -55,10 +58,48 @@ async function toolsCondition(state: z.infer<typeof MessagesState>) {
   return END;
 }
 
-export const agent = new StateGraph(MessagesState)
+export const myAgent = new StateGraph(MessagesState)
   .addNode('llmCall', llmCall)
   .addNode('toolNode', toolNode)
   .addEdge(START, 'llmCall')
   .addConditionalEdges('llmCall', toolsCondition, ['toolNode', END])
   .addEdge('toolNode', 'llmCall')
   .compile();
+
+export const agent = createReactAgent({ llm, tools });
+
+type LLMType = 'basic' | 'reasoning' | 'vision' | 'code';
+
+const AGENT_LLM_MAP: Record<string, LLMType> = {
+  coordinator: 'basic',
+  planner: 'basic',
+  researcher: 'basic',
+  coder: 'basic',
+  reporter: 'basic',
+  podcast_script_writer: 'basic',
+  ppt_composer: 'basic',
+  prose_writer: 'basic',
+  prompt_enhancer: 'basic',
+};
+
+export const get_llm_by_type = (llmType: LLMType) => {
+  const map = {
+    reasoning: 'REASONING_MODEL',
+    basic: 'BASIC_MODEL',
+    vision: 'VISION_MODEL',
+    code: 'CODE_MODEL',
+  };
+  return map[llmType];
+};
+export const createAgent = (
+  agent_name: string,
+  agent_type: string,
+  tools: Array<StructuredTool>,
+  prompt_name: string,
+) =>
+  createReactAgent({
+    name: agent_name,
+    llm,
+    tools,
+    prompt: (state) => applyPromptTemplate(prompt_name, state),
+  });
