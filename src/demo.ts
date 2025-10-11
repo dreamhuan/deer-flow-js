@@ -1,4 +1,4 @@
-import { vlm } from './llm.js';
+import { vlm } from './llms/llm.js';
 
 async function main() {
   const url =

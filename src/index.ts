@@ -1,6 +1,6 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { agent } from './graph.js';
-import { printMsg } from './utils.js';
+import { agent } from './graph/graph.js';
+import { printMsg } from './utils/utils.js';
 
 async function main() {
   const result = await agent.invoke({

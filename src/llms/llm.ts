@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
-import { tools } from './tools.js';
+import { tools } from '../tools/tools.js';
 
 dotenv.config();
 

@@ -1,6 +1,6 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { agent } from './graph.js';
-import { printMsg } from './utils.js';
+import { agent } from './graph/graph.js';
+import { printMsg } from './utils/utils.js';
 import prompts from 'prompts';
 import ora from 'ora';
 import chalk from 'chalk';
