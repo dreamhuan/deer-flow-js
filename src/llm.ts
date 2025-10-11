@@ -23,6 +23,16 @@ export const embeddings = new OpenAIEmbeddings({
 // 记得开启免费“额度用完即停”功能
 export const llm = new ChatOpenAI({
   model: 'qwen3-max-2025-09-23',
+  // model: 'qwen3-omni-flash', // 多模态模型
+  configuration: {
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    apiKey: process.env.DASHSCOPE_API_KEY!,
+  },
+});
+
+// 视觉模型
+export const vlm = new ChatOpenAI({
+  model: 'qwen3-vl-plus',
   configuration: {
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: process.env.DASHSCOPE_API_KEY!,
