@@ -1,9 +1,6 @@
 import { z } from 'zod/v4';
 import { StructuredTool, tool } from '@langchain/core/tools';
 import { TavilyCrawl, TavilySearch } from '@langchain/tavily';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 // Define tools
 const add: StructuredTool = tool(({ a, b }) => a + b, {

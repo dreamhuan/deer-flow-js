@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { tools } from '../tools/tools.js';
-
-dotenv.config();
 
 // 注意输出维度为1024维
 export const embeddings = new OpenAIEmbeddings({
@@ -40,3 +37,27 @@ export const vlm = new ChatOpenAI({
 });
 
 export const llmWithTools = llm.bindTools(tools);
+
+type LLMType = 'basic' | 'reasoning' | 'vision' | 'code';
+
+export const AGENT_LLM_MAP: Record<string, LLMType> = {
+  coordinator: 'basic',
+  planner: 'basic',
+  researcher: 'basic',
+  coder: 'basic',
+  reporter: 'basic',
+  podcast_script_writer: 'basic',
+  ppt_composer: 'basic',
+  prose_writer: 'basic',
+  prompt_enhancer: 'basic',
+};
+
+export const get_llm_by_type = (llmType: LLMType) => {
+  const map = {
+    reasoning: 'REASONING_MODEL',
+    basic: 'BASIC_MODEL',
+    vision: 'VISION_MODEL',
+    code: 'CODE_MODEL',
+  };
+  return map[llmType];
+};

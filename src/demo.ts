@@ -1,6 +1,20 @@
+import 'dotenv/config';
 import { vlm } from './llms/llm.js';
+import { HumanMessage } from '@langchain/core/messages';
+import { demoGraph } from './graph/graph.js';
+import { printMsg } from './utils/utils.js';
 
 async function main() {
+  const result = await demoGraph.invoke({
+    messages: [new HumanMessage('计算12*(9+5/7)-2*6=?')],
+  });
+
+  for (const message of result.messages) {
+    printMsg(message);
+  }
+}
+
+async function visual() {
   const url =
     'https://raw.githubusercontent.com/dreamhuan/stg-game/refs/heads/master/2.png'; // 非直接下载的URL
 

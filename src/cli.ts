@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { HumanMessage } from '@langchain/core/messages';
 import { graph } from './graph/graph.js';
 import { printMsg } from './utils/utils.js';

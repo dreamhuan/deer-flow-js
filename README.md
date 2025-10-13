@@ -1,6 +1,6 @@
 # DeerFlow with Typescript
 
-https://github.com/bytedance/deer-flow
+注意：本项目仅是一个学习项目，作为[deer-flow](https://github.com/bytedance/deer-flow)的学习+复刻，没有实现全部功能，如需使用请直接使用原项目。
 
 ## install
 
@@ -12,6 +12,7 @@ yarn
 去[硅基流动](https://cloud.siliconflow.cn/me/account/ak)和[tavily](https://app.tavily.com/home)注册个key并写入.env
 
 另外，有些问答太费token了，可以白嫖[阿里百炼](https://bailian.console.aliyun.com/?tab=model#/api-key)的免费额度（每个模型100w token）记得一定要开启“免费额度用完即停”功能
+
 ## start
 
 ```

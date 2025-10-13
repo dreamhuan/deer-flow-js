@@ -64,10 +64,7 @@ export function applyPromptTemplate(
     const systemPrompt = env.render(`${promptName}.md`, stateVars);
     return [
       { role: 'system', content: systemPrompt },
-      ...state.messages.map((msg) => ({
-        role: (msg as any).role,
-        content: typeof msg.content === 'string' ? msg.content : '',
-      })),
+      ...(state.messages as any),
     ];
   } catch (e: any) {
     throw new Error(`Error applying template ${promptName}: ${e.message}`);
