@@ -29,7 +29,7 @@ export const demoGraph = new StateGraph(StateSchema)
   .compile();
 
 // 路由函数：返回下一个节点名称
-export function continueToRunningResearchTeam(
+export function continue_to_running_research_team(
   state: State,
 ): 'planner' | 'researcher' | 'coder' {
   const currentPlan = state.current_plan;
@@ -82,12 +82,12 @@ export const graph = new StateGraph(StateSchema)
     ends: ['research_team'],
   })
   .addNode('human_feedback', human_feedback_node, {
-    ends: ['planner', 'reporter', 'research_team', END],
+    ends: ['planner', 'research_team'],
   })
 
   .addEdge(START, 'coordinator')
   .addEdge('background_investigator', 'planner')
-  .addConditionalEdges('research_team', continueToRunningResearchTeam, [
+  .addConditionalEdges('research_team', continue_to_running_research_team, [
     'planner',
     'researcher',
     'coder',

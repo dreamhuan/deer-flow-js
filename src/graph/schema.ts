@@ -69,9 +69,8 @@ export const StateSchema = z.object({
   resources: z.array(ResourceSchema).default([]),
   plan_iterations: z.number().int().default(0),
 
-  // current_plan 可以是 Plan 对象或字符串（如错误信息）
-  current_plan: z.union([PlanSchema, z.string(), z.null()]).default(null),
-
+  // current_plan: z.union([PlanSchema, z.string(), z.null()]).default(null),
+  current_plan: z.union([PlanSchema, z.null()]).default(null),
   final_report: z.string().default(''),
   auto_accepted_plan: z.boolean().default(false),
   enable_background_investigation: z.boolean().default(true),

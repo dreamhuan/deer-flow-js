@@ -2,6 +2,9 @@
 
 注意：本项目仅是一个学习项目，作为[deer-flow](https://github.com/bytedance/deer-flow)的学习+复刻，没有实现全部功能，如需使用请直接使用原项目。
 
+虽然Langgraph本身就会提供节点的图，但还是自己看完代码画了个
+![流程图](./graph.png)
+
 ## install
 
 ```
