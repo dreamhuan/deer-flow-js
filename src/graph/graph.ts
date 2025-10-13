@@ -66,21 +66,31 @@ export function continueToRunningResearchTeam(
 }
 
 export const graph = new StateGraph(StateSchema)
-  .addNode('coordinator', coordinator_node)
-  // .addNode('background_investigator', background_investigation_node)
-  // .addNode('planner', planner_node)
-  // .addNode('reporter', reporter_node)
-  // .addNode('research_team', research_team_node)
-  // .addNode('researcher', researcher_node)
-  // .addNode('coder', coder_node)
-  // .addNode('human_feedback', human_feedback_node)
+  .addNode('coordinator', coordinator_node, {
+    ends: ['background_investigator', 'planner', END],
+  })
+  .addNode('background_investigator', background_investigation_node)
+  .addNode('planner', planner_node, {
+    ends: ['reporter', 'human_feedback'],
+  })
+  .addNode('reporter', reporter_node)
+  .addNode('research_team', research_team_node)
+  .addNode('researcher', researcher_node, {
+    ends: ['research_team'],
+  })
+  .addNode('coder', coder_node, {
+    ends: ['research_team'],
+  })
+  .addNode('human_feedback', human_feedback_node, {
+    ends: ['planner', 'reporter', 'research_team', END],
+  })
 
   .addEdge(START, 'coordinator')
-  // .addEdge('background_investigator', 'planner')
-  // .addConditionalEdges('research_team', continueToRunningResearchTeam, [
-  //   'planner',
-  //   'researcher',
-  //   'coder',
-  // ])
-  // .addEdge('reporter', END)
+  .addEdge('background_investigator', 'planner')
+  .addConditionalEdges('research_team', continueToRunningResearchTeam, [
+    'planner',
+    'researcher',
+    'coder',
+  ])
+  .addEdge('reporter', END)
   .compile();

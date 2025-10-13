@@ -11,7 +11,7 @@ import { llm, llmWithTools } from '../llms/llm.js';
 import { tools, toolsByName } from '../tools/tools.js';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { StructuredTool } from 'langchain/tools';
-import { applyPromptTemplate } from '../prompts/index.js';
+import { apply_prompt_template } from '../prompts/index.js';
 
 const MessagesState = z.object({
   messages: z
@@ -78,5 +78,5 @@ export const createAgent = (
     name: agent_name,
     llm,
     tools,
-    prompt: (state) => applyPromptTemplate(prompt_name, state),
+    prompt: (state) => apply_prompt_template(prompt_name, state),
   });

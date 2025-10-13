@@ -11,18 +11,31 @@ yarn
 
 去[硅基流动](https://cloud.siliconflow.cn/me/account/ak)和[tavily](https://app.tavily.com/home)注册个key并写入.env
 
-另外，有些问答太费token了，可以白嫖[阿里百炼](https://bailian.console.aliyun.com/?tab=model#/api-key)的免费额度（每个模型100w token）记得一定要开启“免费额度用完即停”功能
+另外，有些问答太费token了，可以白嫖[阿里百炼](https://bailian.console.aliyun.com/?tab=model#/api-key)的免费额度（每个模型100w token）**记得一定要开启“免费额度用完即停”功能**
+
+llm的所有定义在`src/llms`下，去[百炼平台](https://bailian.console.aliyun.com/?tab=model#/model-market/all)搜索需要的模型，以及开启免费额度用完即停
 
 ## start
 
+别直接运行！！确保你所有使用的模型均为免费或者已经开了免费额度用完即停或者氪佬随意
+
 ```
-yarn dev
+yarn demo # 跑跑demo调试
+```
+
+```
+yarn dev # 跑完整链路，但是问题代码写死
+```
+
+```
+yarn cli # 逻辑同dev但是命令行交互式提问
 ```
 
 ## 创建数据库
 
 ### 启动带有 pgvector 的 PostgreSQL 容器
 
+```
 docker run -d \
  --name postgres-vector \
  -e POSTGRES_PASSWORD=abc123 \
@@ -30,11 +43,16 @@ docker run -d \
  -v postgres_data:/var/lib/postgresql \
  -p 5432:5432 \
  ankane/pgvector:latest
+```
 
 ### 连接到数据库并创建扩展
 
+```
 docker exec -it postgres-vector psql -U postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
 
 ### 连接url
 
+```
 postgresql://postgres:abc123@localhost:5432/postgres?sslmode=disable
+```

@@ -39,7 +39,7 @@ const divide: StructuredTool = tool(({ a, b }) => a / b, {
   }),
 });
 
-const tavilySearchTool: StructuredTool = new TavilySearch({
+export const tavilySearchTool: StructuredTool = new TavilySearch({
   maxResults: 3,
   // topic: 'general',
   // includeAnswer: false,
@@ -52,7 +52,7 @@ const tavilySearchTool: StructuredTool = new TavilySearch({
   // excludeDomains: [],
 }) as unknown as StructuredTool;
 
-const tavilyCrawlTool: StructuredTool = new TavilyCrawl({
+export const tavilyCrawlTool: StructuredTool = new TavilyCrawl({
   maxDepth: 2,
   maxBreadth: 5,
   // extractDepth: "basic",

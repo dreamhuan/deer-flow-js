@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as nunjucks from 'nunjucks';
 import { fileURLToPath } from 'url';
 import type { MessagesAnnotation } from '@langchain/langgraph';
+import type { BaseMessageLike } from '@langchain/core/messages';
+import type { Configuration } from '../utils/utils.js';
 
 // 获取当前文件目录（兼容 ESM）
 const __filename = fileURLToPath(import.meta.url);
@@ -21,7 +23,7 @@ const env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname), {
 
 // Returns:
 //     The template string with proper variable substitution syntax
-export function getPromptTemplate(promptName: string): string {
+export function get_prompt_template(promptName: string): string {
   try {
     return env.render(`${promptName}.md`, {});
   } catch (e: any) {
@@ -37,10 +39,11 @@ export function getPromptTemplate(promptName: string): string {
 
 // Returns:
 //     List of messages with the system prompt as the first message
-export function applyPromptTemplate(
+export function apply_prompt_template(
   promptName: string,
   state: typeof MessagesAnnotation.State,
-): Array<{ role: string; content: string }> {
+  configurable?: Configuration,
+): BaseMessageLike[] {
   const now = new Date();
   const currentTime = now
     .toLocaleString('en-US', {
@@ -58,6 +61,7 @@ export function applyPromptTemplate(
   const stateVars: Record<string, any> = {
     CURRENT_TIME: currentTime,
     ...state,
+    ...configurable,
   };
 
   try {

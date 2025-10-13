@@ -81,3 +81,15 @@ export const StateSchema = z.object({
 });
 
 export type State = z.infer<typeof StateSchema>;
+
+export const ReportStyle = {
+  ACADEMIC: 'academic',
+  POPULAR_SCIENCE: 'popular_science',
+  NEWS: 'news',
+  SOCIAL_MEDIA: 'social_media',
+  STRATEGIC_INVESTMENT: 'strategic_investment',
+} as const;
+
+export type ReportStyleType = (typeof ReportStyle)[keyof typeof ReportStyle];
+
+export const ReportStyleSchema = z.enum(Object.values(ReportStyle));

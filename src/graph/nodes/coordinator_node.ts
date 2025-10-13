@@ -1,6 +1,6 @@
 import { Command, END } from '@langchain/langgraph';
 import { llm } from '../../llms/llm.js';
-import { applyPromptTemplate } from '../../prompts/index.js';
+import { apply_prompt_template } from '../../prompts/index.js';
 import { handoff_to_planner } from '../../tools/handoff_to_planner.js';
 import type { State } from '../schema.js';
 import { HumanMessage } from 'langchain';
@@ -12,8 +12,9 @@ import { HumanMessage } from 'langchain';
  * 根据topic做后续操作。
  */
 export async function coordinator_node(state: State) {
-  const promptMsg = applyPromptTemplate('coordinator', state);
-  const response = await llm.bindTools([handoff_to_planner]).invoke(promptMsg);
+  console.log('========== inner coordinator_node ==========');
+  const messages = apply_prompt_template('coordinator', state);
+  const response = await llm.bindTools([handoff_to_planner]).invoke(messages);
 
   console.log('Current state', state);
   console.log('Current response', response);
@@ -24,9 +25,9 @@ export async function coordinator_node(state: State) {
   let next = END;
   if (response.tool_calls?.length) {
     console.log('response.tool_calls', response.tool_calls);
-    // next = 'planner';
+    next = 'planner';
     if (state.enable_background_investigation) {
-      // next = 'background_investigator';
+      next = 'background_investigator';
     }
     // 从tool_calls提取主题和语言
     for (const tool_call of response.tool_calls) {
@@ -45,7 +46,6 @@ export async function coordinator_node(state: State) {
     );
   }
 
-  const messages = state.messages;
   // 如果回复有content，则加入消息列表
   if (response.content) {
     messages.push(
