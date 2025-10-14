@@ -35,7 +35,7 @@ export function continue_to_running_research_team(
   const currentPlan = state.current_plan;
 
   // 如果没有计划或步骤为空，返回 planner
-  if (typeof currentPlan === 'string' || !currentPlan?.steps?.length) {
+  if (!currentPlan?.steps?.length) {
     return 'planner';
   }
 
