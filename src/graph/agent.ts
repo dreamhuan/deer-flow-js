@@ -132,17 +132,17 @@ export async function setup_and_execute_agent_step(
   // 构建工具列表
   const loadedTools = [...defaultTools];
 
-  if (Object.keys(mcpServers).length > 0) {
-    const client = new MultiServerMCPClient(mcpServers);
-    const allTools = await client.getTools();
+  // if (Object.keys(mcpServers).length > 0) {
+  //   const client = new MultiServerMCPClient(mcpServers);
+  //   const allTools = await client.getTools();
 
-    for (const tool of allTools) {
-      if (tool.name in enabledTools) {
-        tool.description = `Powered by '${enabledTools[tool.name]}'.\n${tool.description}`;
-        loadedTools.push(tool);
-      }
-    }
-  }
+  //   for (const tool of allTools) {
+  //     if (tool.name in enabledTools) {
+  //       tool.description = `Powered by '${enabledTools[tool.name]}'.\n${tool.description}`;
+  //       loadedTools.push(tool);
+  //     }
+  //   }
+  // }
 
   // TODO：上下文压缩
   const agent = createAgent(agentType, agentType, loadedTools, agentType);
@@ -241,7 +241,7 @@ export async function execute_agent_step(
     result.messages?.[result.messages.length - 1]?.content ?? '';
 
   console.debug(
-    `${agentName.charAt(0).toUpperCase() + agentName.slice(1)} full response:`,
+    `${agentName.charAt(0).toUpperCase() + agentName.slice(1)} full response:\n`,
     responseContent,
   );
 
@@ -252,7 +252,7 @@ export async function execute_agent_step(
   );
 
   // 返回更新和跳转
-  return {
+  return new Command({
     update: {
       messages: [
         new HumanMessage({
@@ -263,5 +263,5 @@ export async function execute_agent_step(
       observations: [...observations, responseContent],
     },
     goto: 'research_team',
-  };
+  });
 }

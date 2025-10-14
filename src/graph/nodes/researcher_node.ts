@@ -18,7 +18,6 @@ export async function researcher_node(state: State, config: RunnableConfig) {
   if (retriever_tool) {
     tools.unshift(retriever_tool);
   }
-  console.log(`Researcher tools: ${tools}`);
 
   return await setup_and_execute_agent_step(state, config, 'researcher', tools);
 }

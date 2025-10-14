@@ -17,14 +17,14 @@ export async function coordinator_node(state: State) {
   const response = await llm.bindTools([handoff_to_planner]).invoke(messages);
 
   console.log('Current state', state);
-  console.log('Current response', response);
+  console.log('Response.content', response.content);
+  console.log('Response.tool_calls', response.tool_calls);
 
   let locale = state.locale || 'en-US';
   let research_topic = state.research_topic || '';
 
   let next = END;
   if (response.tool_calls?.length) {
-    console.log('response.tool_calls', response.tool_calls);
     next = 'planner';
     if (state.enable_background_investigation) {
       next = 'background_investigator';

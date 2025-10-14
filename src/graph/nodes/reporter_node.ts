@@ -4,7 +4,7 @@ import { from_runnable_config } from '../../utils/utils.js';
 import { HumanMessage } from '@langchain/core/messages';
 import { apply_prompt_template } from '../../prompts/index.js';
 import { llm } from '../../llms/llm.js';
-
+import fs from 'fs/promises';
 export async function reporter_node(state: State, config: RunnableConfig) {
   console.log('========== inner reporter_node ==========');
 
@@ -46,11 +46,13 @@ export async function reporter_node(state: State, config: RunnableConfig) {
 
   // TODO: 上下文压缩
   invoke_messages.push(...state.messages);
-  console.log(`Current invoke messages: ${invoke_messages}`);
+  console.log('Current invoke messages: ', invoke_messages);
 
   const response = await llm.invoke(invoke_messages);
   const response_content = response.content;
-  console.log(`reporter response: ${response_content}`);
+  console.log('reporter response: ', response_content);
+
+  fs.writeFile('final_report.md', response_content as string);
 
   return { final_report: response_content };
 }

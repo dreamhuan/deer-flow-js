@@ -1,5 +1,5 @@
 import { HumanMessage } from '@langchain/core/messages';
-
+import { v4 as uuidv4 } from 'uuid';
 import { graph } from './graph.js';
 import { get_recursion_limit } from '../utils/utils.js';
 
@@ -45,9 +45,13 @@ export async function runAgentWorkflowAsync(
     enable_background_investigation: enableBackgroundInvestigation,
   };
 
+  // RETRY.1 const thread_id = '';
+  const thread_id = uuidv4();
+  console.log('current thread_id', thread_id);
+
   const config = {
     configurable: {
-      thread_id: 'default',
+      thread_id,
       max_plan_iterations: maxPlanIterations,
       max_step_num: maxStepNum,
       mcp_settings: {
@@ -62,12 +66,25 @@ export async function runAgentWorkflowAsync(
         },
       },
     },
-    recursion_limit: get_recursion_limit(100),
+    recursion_limit: get_recursion_limit(),
   };
 
   let lastMessageCount = 0;
 
+  // RETRY.2
+  // let newConfig;
+  // for await (const state of graph.getStateHistory(config)) {
+  //   const checkpoint_id = '';
+  //   if (state.config.configurable?.checkpoint_id === checkpoint_id) {
+  //     newConfig = state.config;
+  //     console.log(newConfig);
+  //   }
+  // }
+
   try {
+    // RETRY.3
+    // for await (const state of await graph.stream(null, config)) {
+    // for await (const state of await graph.stream(null, newConfig)) {
     for await (const state of await graph.stream(initialState, config)) {
       // LangGraph.js 的 stream 默认返回 { values: State, ... }
       const s = 'values' in state ? state.values : state;
@@ -96,5 +113,16 @@ export async function runAgentWorkflowAsync(
   } catch (error) {
     log('INFO', `Error in workflow: ${error}`);
     console.error('Workflow error:', error);
+  }
+  console.log('========================= states =========================');
+  const states = [];
+  for await (const state of graph.getStateHistory(config)) {
+    states.push(state);
+  }
+
+  for (const state of states) {
+    console.log('---');
+    console.log('checkpoint_id:', state.config.configurable?.checkpoint_id);
+    console.log('next:', state.next);
   }
 }

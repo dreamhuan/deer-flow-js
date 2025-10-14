@@ -53,7 +53,7 @@ export async function planner_node(state: State, config: RunnableConfig) {
   return new Command({
     update: {
       messages: [new AIMessage({ content: full_response, name: 'planner' })],
-      current_plan: full_response,
+      current_plan: curr_plan,
     },
     goto: 'human_feedback',
   });

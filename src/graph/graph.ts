@@ -2,6 +2,7 @@ import { z } from 'zod/v4';
 import { StateGraph, START, END, MessagesZodMeta } from '@langchain/langgraph';
 import { registry } from '@langchain/langgraph/zod';
 import { type BaseMessage } from '@langchain/core/messages';
+import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
 import { agent, createAgent, myAgent } from './agent.js';
 import { StateSchema, StepType, type State } from './schema.js';
 import { coordinator_node } from './nodes/coordinator_node.js';
@@ -32,6 +33,7 @@ export const demoGraph = new StateGraph(StateSchema)
 export function continue_to_running_research_team(
   state: State,
 ): 'planner' | 'researcher' | 'coder' {
+  console.log('continue_to_running_research_team checking...');
   const currentPlan = state.current_plan;
 
   // 如果没有计划或步骤为空，返回 planner
@@ -65,6 +67,11 @@ export function continue_to_running_research_team(
   return 'planner';
 }
 
+const DB_URI =
+  'postgresql://postgres:abc123@localhost:5432/postgres?sslmode=disable';
+const checkpointer = PostgresSaver.fromConnString(DB_URI);
+await checkpointer.setup();
+
 export const graph = new StateGraph(StateSchema)
   .addNode('coordinator', coordinator_node, {
     ends: ['background_investigator', 'planner', END],
@@ -93,4 +100,4 @@ export const graph = new StateGraph(StateSchema)
     'coder',
   ])
   .addEdge('reporter', END)
-  .compile();
+  .compile({ checkpointer });
