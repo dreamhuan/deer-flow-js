@@ -5,8 +5,9 @@ import { demoGraph } from './graph/graph.js';
 import { printMsg } from './utils/utils.js';
 
 async function main() {
+  const query = '计算12*(9+5/7)-2*6=?';
   const result = await demoGraph.invoke({
-    messages: [new HumanMessage('计算12*(9+5/7)-2*6=?')],
+    messages: [new HumanMessage(query)],
   });
 
   for (const message of result.messages) {

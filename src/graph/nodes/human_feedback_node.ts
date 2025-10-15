@@ -3,7 +3,8 @@ import type { State } from '../schema.js';
 import { HumanMessage } from 'langchain';
 
 /**
- * "人在环路"用户对于计划做出确认，默认是自动确认的
+ * “人在环路”
+ * 用户对于计划做出确认，默认是自动确认的
  * 确认完毕触发research，否则编辑后重新触发plan
  */
 export function human_feedback_node(state: State) {

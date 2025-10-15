@@ -6,6 +6,9 @@ import { Command } from '@langchain/langgraph';
 import type { RunnableConfig } from '@langchain/core/runnables';
 import { from_runnable_config } from '../../utils/utils.js';
 
+/**
+ * 计划节点，根据主题和背景生成符合Plan数据结构的计划，并交给用户判断执行。
+ */
 export async function planner_node(state: State, config: RunnableConfig) {
   console.log('========== inner planner_node ==========');
   console.log('current state', state);

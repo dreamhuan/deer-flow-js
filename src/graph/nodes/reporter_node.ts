@@ -5,6 +5,10 @@ import { HumanMessage } from '@langchain/core/messages';
 import { apply_prompt_template } from '../../prompts/index.js';
 import { llm } from '../../llms/llm.js';
 import fs from 'fs/promises';
+
+/**
+ * 生成报告（同时输出一份报告文件）
+ */
 export async function reporter_node(state: State, config: RunnableConfig) {
   console.log('========== inner reporter_node ==========');
 

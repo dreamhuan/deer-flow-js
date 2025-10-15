@@ -92,6 +92,9 @@ export const createAgent = (
     prompt: (state) => apply_prompt_template(prompt_name, state),
   });
 
+/**
+ * MCP工具注入
+ */
 export async function setup_and_execute_agent_step(
   state: State,
   config: RunnableConfig,
@@ -150,6 +153,9 @@ export async function setup_and_execute_agent_step(
   return execute_agent_step(state, agent, agentType);
 }
 
+/**
+ * agent执行
+ */
 export async function execute_agent_step(
   state: State,
   agent: Runnable,

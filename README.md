@@ -12,29 +12,15 @@ cp .env.sample .env
 yarn
 ```
 
-去[硅基流动](https://cloud.siliconflow.cn/me/account/ak)和[tavily](https://app.tavily.com/home)注册个key并写入.env
+去[硅基流动](https://cloud.siliconflow.cn/me/account/ak)、[百炼平台](https://bailian.console.aliyun.com/?tab=model#/api-key)、[tavily](https://app.tavily.com/home)注册个key并写入.env
 
-另外，有些问答太费token了，可以白嫖[阿里百炼](https://bailian.console.aliyun.com/?tab=model#/api-key)的免费额度（每个模型100w token）**记得一定要开启“免费额度用完即停”功能**
+硅基流动有些免费模型，百炼平台会有免费token。DeepResearch太费token了，免费的模型性能不大行，所以目前用的都是百炼平台的大模型，可以白嫖免费额度（每个模型100w token）**记得一定要开启“免费额度用完即停”功能**
 
-llm的所有定义在`src/llms`下，去[百炼平台](https://bailian.console.aliyun.com/?tab=model#/model-market/all)搜索需要的模型，以及开启免费额度用完即停
+llm的所有定义在`src/llms`下，去[这里](https://bailian.console.aliyun.com/?tab=model#/model-market/all)搜索需要的模型，免费额度用完了就换个模型
 
-## start
+## database
 
-别直接运行！！确保你所有使用的模型均为免费或者已经开了免费额度用完即停或者氪佬随意
-
-```
-yarn demo # 跑跑demo调试
-```
-
-```
-yarn dev # 跑完整链路，但是问题代码写死
-```
-
-```
-yarn cli # 逻辑同dev但是命令行交互式提问
-```
-
-## 创建数据库
+首先自行安装docker...
 
 ### 启动带有 pgvector 的 PostgreSQL 容器
 
@@ -60,6 +46,22 @@ docker exec -it postgres-vector psql -U postgres -c "CREATE EXTENSION IF NOT EXI
 postgresql://postgres:abc123@localhost:5432/postgres?sslmode=disable
 ```
 
+## start
+
+别直接运行！！确保你所有使用的模型均为免费或者已经开了**免费额度用完即停**或者氪佬随意
+
+```
+yarn demo # 跑跑demo调试大模型输入输出
+```
+
+```
+yarn dev # 跑完整链路，但是问题在代码中写死
+```
+
+```
+yarn cli # 逻辑同dev但是命令行交互式提问
+```
+
 ## 运行出错之后的重试
 
 使用postgres记录了LangGraph的checkpoint，所以具备任意节点重试的能力。
@@ -70,9 +72,9 @@ postgresql://postgres:abc123@localhost:5432/postgres?sslmode=disable
 
 ### 任意节点重试
 
-记录运行的thread_id以及期望重试的checkpoint_id，修改`RETRY.1,2,3`3处代码后重新运行（注意，真正重试的是next节点）   
+记录运行的thread_id以及期望重试的checkpoint_id，修改`RETRY.1,2,3`三处代码后重新运行（注意，真正重试的是next节点）
 
-比如checkpoint_id改为`next: [ 'planner' ]`那一项对应的`1f0a8d90-dfb0-6691-800b-9c1e7e925c0f`，实际上重试的会是下一个节点即`1f0a8d90-dfba-62d0-800c-5666fb356ba6`对应的流程，当然因为是`next: [ 'planner' ]`，所以这个的流程就是`planner`节点。
+比如如下的控制台输出，checkpoint_id改为`next: [ 'planner' ]`那一项对应的`1f0a8d90-dfb0-6691-800b-9c1e7e925c0f`，实际上重试的会是下一个节点即`1f0a8d90-dfba-62d0-800c-5666fb356ba6`对应的流程，当然因为是`next: [ 'planner' ]`，所以这个的流程就是`planner`节点。
 
 ```
 ---

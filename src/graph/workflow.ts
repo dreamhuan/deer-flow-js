@@ -20,6 +20,7 @@ export interface RunAgentWorkflowOptions {
   maxPlanIterations?: number;
   maxStepNum?: number;
   enableBackgroundInvestigation?: boolean;
+  finishCb?: () => void;
 }
 
 export async function runAgentWorkflowAsync(
@@ -31,6 +32,7 @@ export async function runAgentWorkflowAsync(
     maxPlanIterations = 1,
     maxStepNum = 3,
     enableBackgroundInvestigation = true,
+    finishCb,
   } = options;
 
   if (!userInput) {
@@ -83,9 +85,11 @@ export async function runAgentWorkflowAsync(
 
   try {
     // RETRY.3
-    // for await (const state of await graph.stream(null, config)) {
-    // for await (const state of await graph.stream(null, newConfig)) {
-    for await (const state of await graph.stream(initialState, config)) {
+    // const stream = await graph.stream(null, config);
+    // const stream = await graph.stream(null, newConfig);
+    const stream = await graph.stream(initialState, config);
+    finishCb?.();
+    for await (const state of stream) {
       // LangGraph.js 的 stream 默认返回 { values: State, ... }
       const s = 'values' in state ? state.values : state;
 

@@ -5,6 +5,7 @@ import { printMsg } from './utils/utils.js';
 import prompts from 'prompts';
 import ora from 'ora';
 import chalk from 'chalk';
+import { runAgentWorkflowAsync } from './graph/workflow.js';
 
 async function cli() {
   console.log(chalk.cyan('开始AI对话，输入 "q" 退出。'));
@@ -33,17 +34,16 @@ async function cli() {
     }).start();
 
     try {
-      const question = userInput.message;
-      const result = await graph.invoke({
-        messages: [new HumanMessage(question)],
-      });
+      const query = userInput.message;
 
       // 成功获取回复后，停止加载动画并显示成功状态
-      spinner.succeed(chalk.blue('AI:'));
-
-      for (const message of result.messages) {
-        printMsg(message);
-      }
+      await runAgentWorkflowAsync(query, {
+        debug: true,
+        maxPlanIterations: 1,
+        maxStepNum: 3,
+        enableBackgroundInvestigation: true,
+        finishCb: () => spinner.succeed(chalk.blue('AI:')),
+      });
     } catch (error) {
       // 如果发生错误，停止加载动画并显示失败状态
       spinner.fail(chalk.red('请求失败'));
