@@ -1,14 +1,16 @@
 import { Command, interrupt } from '@langchain/langgraph';
 import type { State } from '../schema.js';
 import { HumanMessage } from 'langchain';
+import { getLogger } from '../../utils/logger.js';
 
+const logger = getLogger(true);
 /**
  * “人在环路”
  * 用户对于计划做出确认，默认是自动确认的
  * 确认完毕触发research，否则编辑后重新触发plan
  */
 export function human_feedback_node(state: State) {
-  console.log('========== inner human_feedback_node ==========');
+  logger.info('========== inner human_feedback_node ==========');
   const current_plan = state.current_plan;
   const auto_accepted_plan = state.auto_accepted_plan;
 
@@ -23,7 +25,7 @@ export function human_feedback_node(state: State) {
         goto: 'planner',
       });
     } else if (feedback.toUpperCase().startsWith('[ACCEPTED]')) {
-      console.log('Plan is accepted by user.');
+      logger.info('Plan is accepted by user.');
     } else {
       throw TypeError(`Interrupt value of ${feedback} is not supported.`);
     }

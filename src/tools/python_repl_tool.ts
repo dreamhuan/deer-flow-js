@@ -2,7 +2,9 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { getLogger } from '../utils/logger.js';
 
+const logger = getLogger(true);
 const execAsync = promisify(exec);
 
 // 工具开关
@@ -25,9 +27,9 @@ export type PythonREPLInput = z.infer<typeof PythonREPLInputSchema>;
 // 日志装饰器
 function logIO<T extends (...args: any[]) => Promise<any>>(fn: T): T {
   return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
-    console.info(`[Tool: python_repl_tool] Input:`, args[0]);
+    logger.debug(`[Tool: python_repl_tool] Input:`, args[0]);
     const result = await fn(...args);
-    console.info(`[Tool: python_repl_tool] Output:`, result);
+    logger.debug(`[Tool: python_repl_tool] Output:`, result);
     return result;
   }) as T;
 }
@@ -40,17 +42,17 @@ const _pythonREPLTool = logIO(
     if (!isPythonREPLEnabled()) {
       const errorMsg =
         'Python REPL tool is disabled. Please enable it in environment configuration.';
-      console.warn(errorMsg);
+      logger.warn(errorMsg);
       return `Tool disabled: ${errorMsg}`;
     }
 
     if (typeof code !== 'string') {
       const errorMsg = `Invalid input: code must be a string, got ${typeof code}`;
-      console.error(errorMsg);
+      logger.error(errorMsg);
       return `Error executing code:\n\`\`\`python\n${code}\n\`\`\`\nError: ${errorMsg}`;
     }
 
-    console.info('Executing Python code');
+    logger.info('Executing Python code');
     try {
       // 使用 python3 -c 执行代码
       const { stdout, stderr } = await execAsync(
@@ -67,15 +69,15 @@ const _pythonREPLTool = logIO(
         result.toLowerCase().includes('error') ||
         result.toLowerCase().includes('exception')
       ) {
-        console.error(result);
+        logger.error(result);
         return `Error executing code:\n\`\`\`python\n${code}\n\`\`\`\nError: ${result}`;
       }
 
-      console.info('Code execution successful');
+      logger.info('Code execution successful');
       return `Successfully executed:\n\`\`\`python\n${code}\n\`\`\`\nStdout: ${result}`;
     } catch (error: any) {
       const errorMsg = error.message || String(error);
-      console.error('Python execution error:', errorMsg);
+      logger.error('Python execution error:', errorMsg);
       return `Error executing code:\n\`\`\`python\n${code}\n\`\`\`\nError: ${errorMsg}`;
     }
   },

@@ -77,6 +77,8 @@ export const StateSchema = z.object({
   background_investigation_results: z
     .union([z.string(), z.null()])
     .default(null),
+
+  total_tokens: z.number().int().default(0),
 });
 
 export type State = z.infer<typeof StateSchema>;

@@ -13,6 +13,9 @@ import { planner_node } from './nodes/planner_node.js';
 import { reporter_node } from './nodes/reporter_node.js';
 import { research_team_node } from './nodes/research_team_node.js';
 import { researcher_node } from './nodes/researcher_node.js';
+import { getLogger } from '../utils/logger.js';
+
+const logger = getLogger(true);
 
 async function callAgent(state: State) {
   const res = await myAgent.invoke({
@@ -33,7 +36,7 @@ export const demoGraph = new StateGraph(StateSchema)
 export function continue_to_running_research_team(
   state: State,
 ): 'planner' | 'researcher' | 'coder' {
-  console.log('continue_to_running_research_team checking...');
+  logger.info('continue_to_running_research_team checking...');
   const currentPlan = state.current_plan;
 
   // 如果没有计划或步骤为空，返回 planner

@@ -21,7 +21,7 @@ export const embeddings = new OpenAIEmbeddings({
 
 // 记得开启“免费额度用完即停”功能
 export const llm = new ChatOpenAI({
-  model: 'qwen3-max-2025-09-23',
+  model: 'qwen-max',
   configuration: {
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: process.env.DASHSCOPE_API_KEY!,

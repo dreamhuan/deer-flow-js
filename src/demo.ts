@@ -1,10 +1,12 @@
 import 'dotenv/config';
-import { vlm } from './llms/llm.js';
+import { llm, vlm } from './llms/llm.js';
 import { HumanMessage } from '@langchain/core/messages';
 import { demoGraph } from './graph/graph.js';
-import { printMsg } from './utils/utils.js';
+import { calcToken, printMsg } from './utils/utils.js';
+import z from 'zod';
+import { agent } from './graph/agent.js';
 
-async function main() {
+async function runGraph() {
   const query = '计算12*(9+5/7)-2*6=?';
   const result = await demoGraph.invoke({
     messages: [new HumanMessage(query)],
@@ -15,7 +17,7 @@ async function main() {
   }
 }
 
-async function visual() {
+async function runVisual() {
   const url =
     'https://raw.githubusercontent.com/dreamhuan/stg-game/refs/heads/master/2.png'; // 非直接下载的URL
 
@@ -45,4 +47,43 @@ async function visual() {
   console.log(msg);
 }
 
-main();
+async function llmToken() {
+  const { totalTokensRef, callbacks } = calcToken();
+
+  const res = await llm.invoke('12+21=', { callbacks });
+  console.log(res);
+  console.log(totalTokensRef.current);
+}
+
+async function structuredToken() {
+  const { totalTokensRef, callbacks } = calcToken();
+  const outSchema = z.object({
+    yes: z
+      .boolean()
+      .describe('return true if the result is right, else return false'),
+  });
+
+  const res = await llm
+    .withStructuredOutput(outSchema)
+    .invoke(
+      '12+21=30? Please respond with a JSON object containing a "yes" field.',
+      { callbacks },
+    );
+  console.log(res);
+  console.log(totalTokensRef.current);
+}
+
+async function agentToken() {
+  const { totalTokensRef, callbacks } = calcToken();
+
+  const res = await agent.invoke(
+    {
+      messages: '1123+423*123+32423/123=?',
+    },
+    { callbacks },
+  );
+  console.log(res);
+  console.log(totalTokensRef.current);
+}
+
+llmToken();

@@ -1,7 +1,4 @@
 import 'dotenv/config';
-import { HumanMessage } from '@langchain/core/messages';
-import { graph } from './graph/graph.js';
-import { printMsg } from './utils/utils.js';
 import prompts from 'prompts';
 import ora from 'ora';
 import chalk from 'chalk';
@@ -38,7 +35,6 @@ async function cli() {
 
       // 成功获取回复后，停止加载动画并显示成功状态
       await runAgentWorkflowAsync(query, {
-        debug: true,
         maxPlanIterations: 1,
         maxStepNum: 3,
         enableBackgroundInvestigation: true,

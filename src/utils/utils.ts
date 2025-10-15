@@ -9,7 +9,9 @@ import type { RunnableConfig } from '@langchain/core/runnables';
 import z from 'zod/v4';
 import { ReportStyle } from '../graph/schema.js';
 import { ResourceSchema } from '../rag/index.js';
+import { getLogger } from './logger.js';
 
+const logger = getLogger(true);
 // 定义一个新类型，它是一个 AIMessage，并且 tool_calls 字段是必须存在的非空数组
 // 使用 [ToolCall, ...ToolCall[]] 可以更精确地表达“至少有一个元素的数组”
 type AIMessageWithToolCalls = AIMessage & {
@@ -36,6 +38,24 @@ export const printMsg = (
         .join('');
   }
   console.log(`[${type}]: ${content}`);
+};
+
+export const calcToken = () => {
+  const totalTokensRef = {
+    current: 0,
+  };
+  const callbacks = [
+    {
+      handleLLMEnd: (output: any) => {
+        console.log(output);
+        const usage = output.llmOutput?.tokenUsage;
+        if (usage) {
+          totalTokensRef.current += usage.totalTokens || 0;
+        }
+      },
+    },
+  ];
+  return { totalTokensRef, callbacks };
 };
 
 // 工具函数：从环境变量读取
@@ -75,10 +95,10 @@ export function get_recursion_limit(defaultValue: number = 25): number {
   const parsedLimit = getIntEnv('AGENT_RECURSION_LIMIT', defaultValue);
 
   if (parsedLimit > 0) {
-    console.info(`Recursion limit set to: ${parsedLimit}`);
+    logger.info(`Recursion limit set to: ${parsedLimit}`);
     return parsedLimit;
   } else {
-    console.warn(
+    logger.warn(
       `AGENT_RECURSION_LIMIT value '${envValueStr}' (parsed as ${parsedLimit}) is not positive. Using default value ${defaultValue}.`,
     );
     return defaultValue;

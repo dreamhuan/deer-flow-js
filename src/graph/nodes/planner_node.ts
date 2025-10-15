@@ -4,14 +4,16 @@ import { PlanSchema, type State } from '../schema.js';
 import { llm } from '../../llms/llm.js';
 import { Command } from '@langchain/langgraph';
 import type { RunnableConfig } from '@langchain/core/runnables';
-import { from_runnable_config } from '../../utils/utils.js';
+import { calcToken, from_runnable_config } from '../../utils/utils.js';
+import { getLogger } from '../../utils/logger.js';
 
+const logger = getLogger(true);
 /**
  * 计划节点，根据主题和背景生成符合Plan数据结构的计划，并交给用户判断执行。
  */
 export async function planner_node(state: State, config: RunnableConfig) {
-  console.log('========== inner planner_node ==========');
-  console.log('current state', state);
+  logger.info('========== inner planner_node ==========');
+  logger.debug('current state', state);
 
   const plan_iterations = state.plan_iterations || 0;
 
@@ -40,14 +42,21 @@ export async function planner_node(state: State, config: RunnableConfig) {
     );
   }
 
-  const curr_plan = await llm.withStructuredOutput(PlanSchema).invoke(messages);
+  const { totalTokensRef, callbacks } = calcToken();
+  const curr_plan = await llm
+    .withStructuredOutput(PlanSchema)
+    .invoke(messages, { callbacks });
+
   const full_response = JSON.stringify(curr_plan);
+  logger.info('total_tokens:', totalTokensRef.current);
+  const total_tokens = (state.total_tokens || 0) + totalTokensRef.current;
 
   if (curr_plan.has_enough_context) {
     return new Command({
       update: {
         messages: [new AIMessage({ content: full_response, name: 'planner' })],
         current_plan: curr_plan,
+        total_tokens,
       },
       goto: 'reporter',
     });
@@ -57,6 +66,7 @@ export async function planner_node(state: State, config: RunnableConfig) {
     update: {
       messages: [new AIMessage({ content: full_response, name: 'planner' })],
       current_plan: curr_plan,
+      total_tokens,
     },
     goto: 'human_feedback',
   });

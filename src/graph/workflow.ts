@@ -2,21 +2,11 @@ import { HumanMessage } from '@langchain/core/messages';
 import { v4 as uuidv4 } from 'uuid';
 import { graph } from './graph.js';
 import { get_recursion_limit } from '../utils/utils.js';
+import { getLogger } from '../utils/logger.js';
 
-let logLevel: 'INFO' | 'DEBUG' = 'INFO';
-
-function setLogLevel(level: 'INFO' | 'DEBUG') {
-  logLevel = level;
-}
-
-function log(level: 'INFO' | 'DEBUG', message: string) {
-  if (level === 'DEBUG' && logLevel !== 'DEBUG') return;
-  const timestamp = new Date().toISOString();
-  console.log(`${timestamp} - ${level} - ${message}`);
-}
+const logger = getLogger(true);
 
 export interface RunAgentWorkflowOptions {
-  debug?: boolean;
   maxPlanIterations?: number;
   maxStepNum?: number;
   enableBackgroundInvestigation?: boolean;
@@ -28,7 +18,6 @@ export async function runAgentWorkflowAsync(
   options: RunAgentWorkflowOptions = {},
 ) {
   const {
-    debug = false,
     maxPlanIterations = 1,
     maxStepNum = 3,
     enableBackgroundInvestigation = true,
@@ -39,7 +28,7 @@ export async function runAgentWorkflowAsync(
     throw new Error('Input could not be empty');
   }
 
-  log('INFO', `Starting async workflow with user input: ${userInput}`);
+  logger.info(`Starting async workflow with user input: ${userInput}`);
 
   const initialState = {
     messages: [new HumanMessage(userInput)],
@@ -49,7 +38,7 @@ export async function runAgentWorkflowAsync(
 
   // RETRY.1 const thread_id = '';
   const thread_id = uuidv4();
-  console.log('current thread_id', thread_id);
+  logger.info('current thread_id', thread_id);
 
   const config = {
     configurable: {
@@ -71,19 +60,18 @@ export async function runAgentWorkflowAsync(
     recursion_limit: get_recursion_limit(),
   };
 
-  let lastMessageCount = 0;
-
   // RETRY.2
   // let newConfig;
   // for await (const state of graph.getStateHistory(config)) {
   //   const checkpoint_id = '';
   //   if (state.config.configurable?.checkpoint_id === checkpoint_id) {
   //     newConfig = state.config;
-  //     console.log(newConfig);
+  //     logger.info(newConfig);
   //   }
   // }
 
   try {
+    let finalState: any;
     // RETRY.3
     // const stream = await graph.stream(null, config);
     // const stream = await graph.stream(null, newConfig);
@@ -92,41 +80,24 @@ export async function runAgentWorkflowAsync(
     for await (const state of stream) {
       // LangGraph.js 的 stream 默认返回 { values: State, ... }
       const s = 'values' in state ? state.values : state;
-
-      if (typeof s === 'object' && s !== null && 'messages' in s) {
-        const messages = s.messages as any[];
-        if (messages.length <= lastMessageCount) continue;
-        lastMessageCount = messages.length;
-
-        const lastMessage = messages[messages.length - 1];
-
-        // 尝试调用 prettyPrint（如果存在），否则直接打印
-        if (typeof lastMessage?.prettyPrint === 'function') {
-          lastMessage.prettyPrint();
-        } else if (lastMessage?.content) {
-          console.log(lastMessage.content);
-        } else {
-          console.log('Message:', lastMessage);
-        }
-      } else {
-        console.log('Output:', s);
-      }
+      finalState = s;
+      logger.debug('Output:', s);
     }
 
-    log('INFO', 'Async workflow completed successfully');
+    logger.info('Async workflow completed successfully');
+    logger.info('Total tokens used:', finalState?.reporter?.total_tokens);
   } catch (error) {
-    log('INFO', `Error in workflow: ${error}`);
-    console.error('Workflow error:', error);
+    logger.error('Workflow error:', error);
   }
-  console.log('========================= states =========================');
+  logger.info('========================= states =========================');
   const states = [];
   for await (const state of graph.getStateHistory(config)) {
     states.push(state);
   }
 
   for (const state of states) {
-    console.log('---');
-    console.log('checkpoint_id:', state.config.configurable?.checkpoint_id);
-    console.log('next:', state.next);
+    logger.info('---');
+    logger.info('checkpoint_id:', state.config.configurable?.checkpoint_id);
+    logger.info('next:', state.next);
   }
 }

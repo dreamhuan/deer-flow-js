@@ -32,12 +32,14 @@
     "nunjucks": "^3.2.4",
     "ora": "^9.0.0",
     "prompts": "^2.4.2",
+    "winston": "^3.18.3",
     "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.6",
     "@types/nunjucks": "^3.2.6",
     "@types/prompts": "^2.4.9",
+    "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
     "eslint": "^9.36.0",

@@ -4,7 +4,10 @@ import { apply_prompt_template } from '../../prompts/index.js';
 import { handoff_to_planner } from '../../tools/handoff_to_planner.js';
 import type { State } from '../schema.js';
 import { HumanMessage } from 'langchain';
+import { getLogger } from '../../utils/logger.js';
+import { calcToken } from '../../utils/utils.js';
 
+const logger = getLogger(true);
 /**
  * 协调员是首先面对用户的结点，协调员的提示词定义了它的行为逻辑，
  * 对于大多数的问题，调用一个“handoff_to_planner”空函数，把主题和语言作为参数传入（具体细节自行查看提示词），
@@ -12,13 +15,18 @@ import { HumanMessage } from 'langchain';
  * 根据topic做后续操作。
  */
 export async function coordinator_node(state: State) {
-  console.log('========== inner coordinator_node ==========');
+  logger.info('========== inner coordinator_node ==========');
   const messages = apply_prompt_template('coordinator', state);
-  const response = await llm.bindTools([handoff_to_planner]).invoke(messages);
+  const { totalTokensRef, callbacks } = calcToken();
+  const response = await llm
+    .bindTools([handoff_to_planner])
+    .invoke(messages, { callbacks });
 
-  console.log('Current state', state);
-  console.log('Response.content', response.content);
-  console.log('Response.tool_calls', response.tool_calls);
+  logger.debug('Current state', state);
+  logger.debug('Response.content', response.content);
+  logger.debug('Response.tool_calls', response.tool_calls);
+  logger.info('total_tokens', totalTokensRef.current);
+  const total_tokens = (state.total_tokens || 0) + totalTokensRef.current;
 
   let locale = state.locale || 'en-US';
   let research_topic = state.research_topic || '';
@@ -41,7 +49,7 @@ export async function coordinator_node(state: State) {
       }
     }
   } else {
-    console.warn(
+    logger.warn(
       'Coordinator response contains no tool calls. Terminating workflow execution.',
     );
   }
@@ -58,9 +66,10 @@ export async function coordinator_node(state: State) {
 
   return new Command({
     update: {
-      messages: messages,
-      locale: locale,
-      research_topic: research_topic,
+      messages,
+      locale,
+      research_topic,
+      total_tokens,
       // resources: configurable.resources,
     },
     goto: next,

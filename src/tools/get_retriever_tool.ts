@@ -1,7 +1,9 @@
 import z from 'zod/v4';
 import type { Resource } from '../rag/index.js';
 import { tool } from '@langchain/core/tools';
+import { getLogger } from '../utils/logger.js';
 
+const logger = getLogger(true);
 const RetrieverInputSchema = z.object({
   keywords: z.string().describe('search keywords to look up'),
 });
@@ -16,7 +18,7 @@ export function get_retriever_tool(resources: Resource[]) {
     return null;
   }
 
-  console.info(`create retriever tool`);
+  logger.info(`create retriever tool`);
   const retriever = buildRetriever();
 
   if (!retriever) {
@@ -25,7 +27,7 @@ export function get_retriever_tool(resources: Resource[]) {
 
   return tool(
     async (input: RetrieverInput) => {
-      console.info('Retriever tool query:', input.keywords, { resources });
+      logger.debug('Retriever tool query:', input.keywords, { resources });
 
       const documents = await retriever.queryRelevantDocuments(
         input.keywords,
