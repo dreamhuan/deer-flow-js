@@ -1,3 +1,7 @@
+/**
+ * 这个目录下的prompts只用到了部分，内容完全拷贝于字节deer-flow项目
+ * link: https://github.com/bytedance/deer-flow/blob/main/src/prompts/template.py
+ */
 import * as path from 'path';
 import * as nunjucks from 'nunjucks';
 import { fileURLToPath } from 'url';
